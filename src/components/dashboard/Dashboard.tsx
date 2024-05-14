@@ -18,7 +18,7 @@ const Dashboard = () => {
 
   if (user) {
     return (
-      <Box>
+      <Box sx={{ bgcolor: '#dedede' }}>
         <div className="w-full h-screen flex flex-col justify-center items-center gap-6">
           <div 
             className="flex flex-col justify-center items-center shadow hover:shadow-lg bg-white rounded p-8 cursor-pointer"
