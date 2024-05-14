@@ -9,6 +9,7 @@ const UnauthorizedPage = React.lazy(() => import('../pages/UnAuthorizedPage'));
 const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage'));
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const ProjectPage = React.lazy(() => import('../pages/ProjectPage'));
+const NewProjectPage = React.lazy(() => import('../pages/NewProjectPage'));
 
 export default function AppRoutes(): React.JSX.Element {
 	return (
@@ -34,10 +35,20 @@ export default function AppRoutes(): React.JSX.Element {
 				>
 					<Route
 						path='projects'
-						element={
-							<ProjectPage />
-						}
-					/>
+					>
+						<Route 
+							path='new'
+							element={
+								<NewProjectPage />
+							}
+						/>
+						<Route
+							path=''
+							element={
+								<ProjectPage />
+							}
+						/>
+					</Route>
 				</Route>
 				
 				<Route element={<NotFoundPage />} path="*" />
