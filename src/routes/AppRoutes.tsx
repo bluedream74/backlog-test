@@ -4,6 +4,7 @@ import CenteredCircularProgress from '../components/elements/CenteredCircularPro
 import ReadOnlyAccessGuardedRoute from './ReadOnlyAccessGuardedRoute';
 
 // Lazy load all pages
+const Layout = React.lazy(() => import('../components/layout/Layout'));
 const UnauthorizedPage = React.lazy(() => import('../pages/UnAuthorizedPage'));
 const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage'));
 const HomePage = React.lazy(() => import('../pages/HomePage'));
@@ -11,31 +12,36 @@ const ProjectPage = React.lazy(() => import('../pages/ProjectPage'));
 
 export default function AppRoutes(): React.JSX.Element {
 	return (
-		<Routes>
-			{/* Core Routes */}
-			<Route element={<UnauthorizedPage />} path="unauthorized" />
+		<Suspense fallback={<CenteredCircularProgress />} >
+			<Routes>
+				{/* Core Routes */}
+				<Route element={<UnauthorizedPage />} path="unauthorized" />
 
-			<Route
-				path="/"
-				element={
-					<Suspense fallback={<CenteredCircularProgress />} >
+				<Route
+					path="/"
+					element={
 						<HomePage />
-					</Suspense>
-				}
-			/>
+					}
+				/>
 
-			<Route
-				path="/projects"
-				element={
-					<ReadOnlyAccessGuardedRoute>
-						<Suspense fallback={<CenteredCircularProgress />}>
+				<Route
+					path="/"
+					element={
+						<ReadOnlyAccessGuardedRoute>
+							<Layout />
+						</ReadOnlyAccessGuardedRoute>
+					}
+				>
+					<Route
+						path='projects'
+						element={
 							<ProjectPage />
-						</Suspense>
-					</ReadOnlyAccessGuardedRoute>
-				}
-			/>
-
-			<Route element={<NotFoundPage />} path="*" />
-		</Routes>
+						}
+					/>
+				</Route>
+				
+				<Route element={<NotFoundPage />} path="*" />
+			</Routes>
+		</Suspense>
 	);
 }
