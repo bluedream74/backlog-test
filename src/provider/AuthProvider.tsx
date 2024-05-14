@@ -2,111 +2,78 @@ import AuthContext, { UserType } from "../context/AuthContext";
 import { useState } from "react";
 import axiosApi, { axiosTokenApi } from "../utils/axios";
 
+interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserType>({
-    email: null,
-    password: null
-  });
+  const [user, setUser] = useState<UserType | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(localStorage.getItem('access_token'))
+  const [refreshToken, setRefreshToken] = useState<string | null>(localStorage.getItem('refresh_token'))
 
-  const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
-
-  const signin = (newUser: UserType, callback: VoidFunction):Promise<boolean> => {
-    return axiosApi
-      .post(`/account/api/admin_login/`, newUser)
-      .then((res: { data: { access_token: string; refresh_token: string; }; }) => {
-        setUser({
-          email: newUser.email,
-          password: ''
-        });
-        setIsUserLoggedIn(true);
-        localStorage.setItem('access_token', res.data.access_token);
-        localStorage.setItem('refresh_token', res.data.refresh_token);
-
-        callback();
-        return true;
-      })
-      .catch(() => {
-        setUser({
-          email: null,
-          password: null
-        });
-        return false;
+  const getTokenFromCode = async (code: string) => {
+    try {
+      const response = await axiosApi.post<TokenResponse>("/api/v2/oauth2/token", {
+        grant_type: "authorization_code",
+        client_id: "RHrMJDSovwIrGetZfgy0KbSzpzC7jVgr",
+        client_secret: "fBSACGGumP9AcsBK6cwsJRv6ecCfyOS0PFM8pSqr0UyZsSZAerU76QpZvEWNboFj",
+        redirect_uri: "http://localhost:3000",
+        code: code
       });
-  };
-
-  const signout = (callback: VoidFunction) => {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    setUser({
-      email: null,
-      password: null
-    });
-    setIsUserLoggedIn(false);
-    callback();
-  };
-
-  const checkToken = async (): Promise<boolean | undefined> => {
-    const access_token: string | null = localStorage.getItem('access_token');
-    const refresh_token: string | null = localStorage.getItem('refresh_token');
-
-    if (access_token === null || refresh_token === null) {
-      return false;
+  
+      localStorage.setItem('access_token', response.data.access_token);
+      setAccessToken(response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
+      setRefreshToken(response.data.refresh_token);
+    } catch (error) {
+      console.error("Failed to retrieve tokens:", error);
     }
-
-    const resetUserAndTokens = () => {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      setUser({
-        email: null,
-        password: null
-      });
-      setIsUserLoggedIn(false);
-    };
-
-    const payload = {
-      access_token: access_token
-    };
-
-    return axiosTokenApi
-      .post(`account/api/check_token/`, payload)
-      .then((res: { data: { email: string; }; }) => {
-        setUser({
-          email: res.data.email,
-          password: ''
-        });
-        return true;
-      })
-      .catch((err: { response: { status: number; }; }) => {
-        if (err.response && err.response.status !== 403) {
-          axiosApi
-            .post(`account/api/login/refresh/`, { refresh_token })
-            .then((res: { data: { access_token: string; }; }) => {
-              axiosTokenApi
-                .post(`account/api/check_token/`, {access_token: res.data.access_token})
-                .then((res: { data: { email: string; }; }) => {
-                  setUser({
-                    email: res.data.email,
-                    password: ''
-                  });
-                  return true;
-                })
-                .catch(() => {
-                  resetUserAndTokens();
-                  return false;
-                });
-            })
-            .catch(() => {
-              resetUserAndTokens();
-              return false;
-            });
-        } else {
-          resetUserAndTokens();
-          return false;
-        }
-      });
   }
 
-  const value = { user, isUserLoggedIn, signin, signout, checkToken };
+  const resetUserAndToken = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    setUser(null);
+    setAccessToken(null);
+    setRefreshToken(null);
+  };
+
+  const getOwnUser = async () => {
+    if (accessToken === null || refreshToken === null) {
+      return;
+    }
+
+    try {
+      const response = await axiosTokenApi.get<UserType>('/api/v2/users/myself');
+      setUser(response.data);
+      return;
+    } catch {
+      console.log('access token has timed out');
+
+      try {
+        const response = await axiosApi.post<TokenResponse>('/api/v2/oauth2/token', {
+          grant_type: "refresh_token",
+          client_id: "RHrMJDSovwIrGetZfgy0KbSzpzC7jVgr",
+          client_secret: "fBSACGGumP9AcsBK6cwsJRv6ecCfyOS0PFM8pSqr0UyZsSZAerU76QpZvEWNboFj",
+          refresh_token: refreshToken
+        });
+
+        localStorage.setItem('access_token', response.data.access_token);
+        setAccessToken(response.data.access_token);
+        localStorage.setItem('refresh_token', response.data.refresh_token);
+        setRefreshToken(response.data.refresh_token);
+
+        setUser((await axiosTokenApi.get<UserType>('/api/v2/users/myself')).data);
+
+        return;
+      } catch {
+        resetUserAndToken();
+      }
+    }
+  }
+
+  const value = { user, accessToken, refreshToken, getTokenFromCode, getOwnUser, resetUserAndToken };
 
   return (
     <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

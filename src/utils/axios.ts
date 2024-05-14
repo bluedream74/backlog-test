@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000/";
+const BASE_URL = "https://nulab-exam.backlog.jp";
 
 const axiosApi = axios.create({
   baseURL: BASE_URL,

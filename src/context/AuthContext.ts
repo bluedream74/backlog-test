@@ -1,16 +1,25 @@
 import { createContext, useContext } from 'react';
 
 export interface UserType {
-  email: string | null,
-  password: string| null
+  id: number;
+  userId: string;
+  name: string;
+  mailAddress: string;
+  nulabAccount: {
+    nulabId: string;
+    name: string;
+    iconUrl: string;
+    uniqueId: string;
+  }
 }
 
 export interface AuthContextType {
-  user: UserType;
-  isUserLoggedIn: boolean;
-  signin: (user: UserType, callback: VoidFunction) => Promise<boolean>;
-  signout: (callback: VoidFunction) => void;
-  checkToken: () => Promise<boolean | undefined>;
+  user: UserType | null;
+  accessToken: string | null;
+  refreshToken: string | null;
+  getTokenFromCode: (code: string) => void;
+  getOwnUser: () => void;
+  resetUserAndToken: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>(null!);
