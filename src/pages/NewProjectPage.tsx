@@ -28,7 +28,10 @@ const NewProjectPage = () => {
     dispatch(addProject(formData))
       .then(() => {
         naviate('/projects');
-      });
+      })
+      .catch(() => {
+        console.log('permission error');
+      })
   }
 
   return (

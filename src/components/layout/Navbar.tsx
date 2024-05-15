@@ -21,7 +21,7 @@ export default function Navbar() {
     handleClose();
     setTimeout(() => {
       navigate(url);
-    }, 10);
+    }, 50);
   }
 
   return (
@@ -47,7 +47,7 @@ export default function Navbar() {
             }}
           >
             <MenuItem onClick={() => { goPage('/projects') }}>View All</MenuItem>
-            <MenuItem onClick={() => { goPage('/projects/new') }}>New Project</MenuItem>
+            {/* <MenuItem onClick={() => { goPage('/projects/new') }}>New Project</MenuItem> */}
           </Menu>
         </Container>
       </div>

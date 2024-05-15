@@ -10,6 +10,7 @@ const NotFoundPage = React.lazy(() => import('../pages/NotFoundPage'));
 const HomePage = React.lazy(() => import('../pages/HomePage'));
 const ProjectPage = React.lazy(() => import('../pages/ProjectPage'));
 const NewProjectPage = React.lazy(() => import('../pages/NewProjectPage'));
+const ProjectDetailPage = React.lazy(() => import('../pages/ProjectDetailPage'));
 
 export default function AppRoutes(): React.JSX.Element {
 	return (
@@ -40,6 +41,12 @@ export default function AppRoutes(): React.JSX.Element {
 							path='new'
 							element={
 								<NewProjectPage />
+							}
+						/>
+						<Route 
+							path=':id'
+							element={
+								<ProjectDetailPage />
 							}
 						/>
 						<Route

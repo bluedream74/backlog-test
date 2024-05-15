@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="text-neutral-600 lg:text-left bg-white py-4 border-t-[1px]">
+    <footer className="absolute bottom-0 w-full text-neutral-600 lg:text-left bg-white py-4 border-t-[1px]">
       <div className="text-center">
         <span>© 2024 Copyright:</span>
         <Link

@@ -11,9 +11,9 @@ const ProjectList: React.FC<ProjectListProps> = ({
 }) => {
   return (
     <Box
-      sx={{ width: '100%', maxWidth: 'xl' }}
+      sx={{ width: '100%', maxWidth: 'xl', paddingY: 2 }}
     >
-      <List>
+      <List className="rounded shadow bg-white">
         {projects && (
           projects.map((project, index) => (
             <ProjectItem key={`project ${index}`} project={project} />

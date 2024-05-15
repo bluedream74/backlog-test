@@ -4,9 +4,11 @@ import Navbar from "./Navbar";
 
 const Layout = () => {
   return (
-    <div>
+    <div className="relative min-h-full">
       <Navbar />
-      <Outlet />
+      <div className="w-full pb-10">
+        <Outlet />
+      </div>
       <Footer />
     </div>
   );
