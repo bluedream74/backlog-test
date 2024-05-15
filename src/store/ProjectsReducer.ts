@@ -31,6 +31,18 @@ const projectsSlice = createSlice({
       .addCase(getProjects.rejected, (state) => {
         state.status = "failed";
         state.all = [];
+      });
+
+    builder
+      .addCase(addProject.fulfilled, (state, action) => {
+        state.all = [...state.all, action.payload];
+        state.status = "idle";
+      })
+      .addCase(addProject.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addProject.rejected, (state) => {
+        state.status = "failed";
       })
   }
 });
@@ -41,6 +53,17 @@ export const getProjects = createAsyncThunk(
     const response = await axiosTokenApi.get('/api/v2/projects');
     return response.data;
   }
-)
+);
+
+export const addProject = createAsyncThunk(
+  'projects/add',
+  async ({name, key}: { name: string; key: string}) => {
+    const response = await axiosTokenApi.post('/api/v2/projects', {
+      name: name,
+      key: key
+    });
+    return response.data
+  }
+);
 
 export default projectsSlice.reducer;
