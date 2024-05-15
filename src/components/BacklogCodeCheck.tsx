@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import CenteredCircularProgress from "./elements/CenteredCircularProgress";
 
 interface BacklogCodeCheckProps {
   code: string;
@@ -15,7 +16,7 @@ const BacklogCodeCheck: React.FC<BacklogCodeCheckProps> = ({
   }, [code, auth]);
 
   return (
-    <>Code Reviewing</>
+    <CenteredCircularProgress />
   );
 }
  
